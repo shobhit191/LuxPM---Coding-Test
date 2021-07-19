@@ -1,1 +1,33 @@
-wwww
+from PIL import Image
+img = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_1.png').convert('LA')
+img.save(r'C:/Users/Shobhitsisodia/Desktop/greyscale.png')
+
+import cv2 as cv
+from matplotlib import pyplot as plt
+img = cv.imread(r'C:/Users/Shobhitsisodia/Desktop/apple_1.png',0)
+edges = cv.Canny(img,100,200)
+plt.subplot(122),plt.imshow(edges,cmap = 'gray')
+plt.show()
+
+img2 = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_2.png').convert('LA')
+img2.save(r'C:/Users/Shobhitsisodia/Desktop/greyscale2.png')
+
+img2 = cv.imread(r'C:/Users/Shobhitsisodia/Desktop/apple_2.png',0)
+edges2 = cv.Canny(img2,100,200)
+plt.subplot(122),plt.imshow(edges2,cmap = 'gray')
+plt.show()
+
+import math
+img1 = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_1.png').convert('LA')
+img2 = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_2.png').convert('LA')
+
+height1 = img1.size[0]
+width1 = img1.size[1]
+div = math.gcd(width1, height1)
+print(f"{width1/div}:{height1/div}")
+
+height2 = img2.size[0]
+width2 = img2.size[1]
+
+div = math.gcd(width2, height2)
+print(f"{width2/div}:{height2/div}")
