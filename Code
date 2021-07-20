@@ -1,6 +1,11 @@
+################# Solution 1 #######################################
+####### Reading the saved image and covert it to gray scale and save it ########
+
 from PIL import Image
 img = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_1.png').convert('LA')
 img.save(r'C:/Users/Shobhitsisodia/Desktop/greyscale.png')
+
+########### Solution 2 ##################
 
 import cv2 as cv
 from matplotlib import pyplot as plt
@@ -8,6 +13,8 @@ img = cv.imread(r'C:/Users/Shobhitsisodia/Desktop/apple_1.png',0)
 edges = cv.Canny(img,100,200)
 plt.subplot(122),plt.imshow(edges,cmap = 'gray')
 plt.show()
+
+########## Solution 3 #################
 
 img2 = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_2.png').convert('LA')
 img2.save(r'C:/Users/Shobhitsisodia/Desktop/greyscale2.png')
@@ -17,17 +24,96 @@ edges2 = cv.Canny(img2,100,200)
 plt.subplot(122),plt.imshow(edges2,cmap = 'gray')
 plt.show()
 
+################### Solution 4 #########################
+
+import numpy as np
 import math
-img1 = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_1.png').convert('LA')
-img2 = Image.open(r'C:/Users/Shobhitsisodia/Desktop/apple_2.png').convert('LA')
 
-height1 = img1.size[0]
-width1 = img1.size[1]
-div = math.gcd(width1, height1)
-print(f"{width1/div}:{height1/div}")
+contours, hierarchy = cv.findContours(edges,cv.RETR_LIST,cv.CHAIN_APPROX_NONE) 
 
-height2 = img2.size[0]
-width2 = img2.size[1]
+#Select longest contour as this should be the capsule
+lengthC=0
+ID=-1
+idCounter=-1
+for x in contours:
+    idCounter=idCounter+1 
+    if len(x) > lengthC:
+        lengthC=len(x)
+        ID=idCounter
 
-div = math.gcd(width2, height2)
-print(f"{width2/div}:{height2/div}")
+if ID != -1:
+    cnt = contours[ID]
+    cntFull=cnt.copy()
+
+    #approximate the contour, where epsilon is the distance to 
+    #the original contour
+    cnt = cv.approxPolyDP(cnt, epsilon=1, closed=True)
+
+    #add the first point as the last point, to ensure it is closed
+    lenCnt=len(cnt)
+    cnt= np.append(cnt, [[cnt[0][0][0], cnt[0][0][1]]]) 
+    cnt=np.reshape(cnt, (lenCnt+1,1, 2))
+
+    lenCntFull=len(cntFull)
+    cntFull= np.append(cntFull, [[cntFull[0][0][0], cntFull[0][0][1]]]) 
+    cntFull=np.reshape(cntFull, (lenCntFull+1,1, 2))
+
+    #find the moments
+    M = cv.moments(cnt)
+    MFull = cv.moments(cntFull)
+    
+
+contours, hierarchy = cv.findContours(edges2,cv.RETR_LIST,cv.CHAIN_APPROX_NONE) 
+
+#Select longest contour as this should be the capsule
+lengthC1=0
+ID1=-1
+idCounter1=-1
+for x in contours:
+    idCounter1=idCounter1+1 
+    if len(x) > lengthC1:
+        lengthC1=len(x)
+        ID1=idCounter1
+
+if ID1 != -1:
+    cnt = contours[ID1]
+    cntFull=cnt.copy()
+
+    #approximate the contour, where epsilon is the distance to 
+    #the original contour
+    cnt = cv.approxPolyDP(cnt, epsilon=1, closed=True)
+
+    #add the first point as the last point, to ensure it is closed
+    lenCnt=len(cnt)
+    cnt= np.append(cnt, [[cnt[0][0][0], cnt[0][0][1]]]) 
+    cnt=np.reshape(cnt, (lenCnt+1,1, 2))
+
+    lenCntFull=len(cntFull)
+    cntFull= np.append(cntFull, [[cntFull[0][0][0], cntFull[0][0][1]]]) 
+    cntFull=np.reshape(cntFull, (lenCntFull+1,1, 2))
+
+    #find the moments
+    M = cv.moments(cnt)
+    MFull2 = cv.moments(cntFull)
+
+Area1 = int(MFull['m00'])
+Area2 = int(MFull2['m00'])
+
+div = math.gcd(Area1,Area2)
+
+print("Ratio between the area of two edges is :",f"{Area1/div}:{Area2/div}")
+
+############ Solution 5 ######################
+
+print("The longest distance between edges in first image = ",ID)
+
+############ Solution 6 ######################
+
+print("The longest distance between edges in first image = ",ID1)
+
+############ Solution 7 ######################
+
+dist1 = int(ID)
+dist2 = int(ID1)
+dist_div = math.gcd(dist1,dist2)
+print("Ratio between the area of two edges is :",f"{dist1/dist_div}:{dist2/dist_div}")
